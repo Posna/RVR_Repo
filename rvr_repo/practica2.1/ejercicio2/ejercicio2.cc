@@ -104,8 +104,9 @@ int main(int argc, char **argv)
     else{
       char warn[] = "Comando no soportado ";
       strcat(warn, buffer);
-      sendto(sd, warn, sizeof(warn), 0, &client_addr, client_len);
+      sendto(sd, warn, strlen(warn)-2, 0, &client_addr, client_len);
     }
+    strcpy(buffer, "");
   }
   std::cout << "Saliendo..." << std::endl;
   return 0;
