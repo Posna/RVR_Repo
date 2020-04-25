@@ -6,26 +6,6 @@
 
 #include <iostream>
 
-/*
-argv[0] ---> nombre del programa
-argv[1] ---> primer argumento (char *)
-
-./addrinfo www.ucm.es 80
-argv[0] = "./addrinfo"
-argv[1] = "www.ucm.es"
-argv[2] = "80"
-|
-|
-V
-res->ai_addr ---> (socket + bind)
-|
-|
-V
-host (numeric)
-
-./addrinfo 127.0.0.1 80
-./addrinfo www.ucm.es http
-*/
 int main(int argc, char **argv)
 {
 struct addrinfo hints;
@@ -51,7 +31,7 @@ return -1;
 // res contiene la representación como sockaddr de dirección + puerto
 
 int sd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-printf("%d\n", sd);
+
 if(sd < 0)
 {
   std::cerr << "socket error: \n";
