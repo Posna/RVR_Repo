@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 
   while (res != NULL)
   {
-    getnameinfo(res->ai_addr, res->ai_addrlen, host, NI_MAXHOST, NULL, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
+    getnameinfo(res->ai_addr, res->ai_addrlen, host, NI_MAXHOST, NULL, NI_MAXSERV, NI_NUMERICHOST);
 
     std::cout << "IP: " << host << " FAMILY: " << res->ai_family << " SOCKTYPE: " << res->ai_socktype << std::endl;
     res = res->ai_next;
