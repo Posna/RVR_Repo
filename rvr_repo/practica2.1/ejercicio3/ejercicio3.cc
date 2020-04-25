@@ -32,7 +32,7 @@ struct addrinfo hints;
 struct addrinfo * res;
 
 // ---------------------------------------------------------------------- //
-// INICIALIZACIÓN SOCKET & BIND //
+// INICIALIZACIÓN SOCKET//
 // ---------------------------------------------------------------------- //
 
 memset(&hints, 0, sizeof(struct addrinfo));
@@ -51,19 +51,19 @@ return -1;
 // res contiene la representación como sockaddr de dirección + puerto
 
 int sd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+printf("%d\n", sd);
+if(sd < 0)
+{
+  std::cerr << "socket error: \n";
+  return -1;
 
-//if ( bind(sd, res->ai_addr, res->ai_addrlen) != 0 )
-//{
-//std::cerr << "bind: " << std::endl;
-//return -1;
-//}
+}
 
-//freeaddrinfo(res);
 
 // ---------------------------------------------------------------------- //
 // RECEPCIÓN MENSAJE DE CLIENTE //
 // ---------------------------------------------------------------------- //
-char buffer[40];
+char buffer[30];
 char host[NI_MAXHOST];
 char service[NI_MAXSERV];
 
@@ -71,21 +71,12 @@ struct sockaddr client_addr;
 socklen_t client_len = sizeof(struct sockaddr);
 
 
-
-
-
-//getnameinfo(&client_addr, client_len, host, NI_MAXHOST, service,
-//NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
-
-//std::cout << "IP: " << host << " PUERTO: " << service
-//<< "MENSAJE: " << buffer << std::endl;
-
 // ---------------------------------------------------------------------- //
 // RESPUESTA AL CLIENTE //
 // ---------------------------------------------------------------------- //
-sendto(sd, argv[3], strlen(argv[3]), 0, res->ai_addr, res->ai_addrlen);
+sendto(sd, argv[3], strlen(argv[3])+1, 0, res->ai_addr, res->ai_addrlen);
 
-ssize_t bytes = recvfrom(sd, buffer, 39 * sizeof(char), 0, res->ai_addr, &res->ai_addrlen);
+ssize_t bytes = recvfrom(sd, buffer, 29 * sizeof(char), 0, res->ai_addr, &res->ai_addrlen);
 
 if ( bytes == -1)
 {

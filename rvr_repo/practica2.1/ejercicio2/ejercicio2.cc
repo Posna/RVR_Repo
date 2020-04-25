@@ -73,6 +73,7 @@ int main(int argc, char **argv)
 
   while (salir) {
 
+    //Espera hasta recibir mensaje del cliente
     ssize_t bytes = recvfrom(sd, buffer, 39 * sizeof(char), 0, &client_addr,
     &client_len);
 
@@ -90,23 +91,27 @@ int main(int argc, char **argv)
     // ---------------------------------------------------------------------- //
     // RESPUESTA AL CLIENTE //
     // ---------------------------------------------------------------------- //
-    if(buffer[0] == 't'){
+
+    if(strcmp(buffer, "t") == 0){
       size_t tbytes = hora(respuesta, 39 * sizeof(char));
-      sendto(sd, respuesta, tbytes, 0, &client_addr, client_len);
+      sendto(sd, respuesta, tbytes+1, 0, &client_addr, client_len);
     }
-    else if(buffer[0] == 'd'){
+    else if(strcmp(buffer, "d") == 0){
       size_t tbytes = fecha(respuesta, 39 * sizeof(char));
-      sendto(sd, respuesta, tbytes, 0, &client_addr, client_len);
+      sendto(sd, respuesta, tbytes+1, 0, &client_addr, client_len);
     }
-    else if(buffer[0] == 'q'){
+    else if(strcmp(buffer, "q") == 0){
+      char saliendo[] = "Saliendo...";
+      sendto(sd, saliendo, strlen(saliendo) + 1, 0, &client_addr, client_len);
       salir = FALSE;
     }
     else{
       char warn[] = "Comando no soportado ";
+      size_t tam = bytes + strlen(warn) + 1;
       strcat(warn, buffer);
-      sendto(sd, warn, strlen(warn)-2, 0, &client_addr, client_len);
+      sendto(sd, warn, tam, 0, &client_addr, client_len);
     }
-    strcpy(buffer, "");
+    memset(buffer, 0, sizeof buffer);
   }
   std::cout << "Saliendo..." << std::endl;
   return 0;
