@@ -47,8 +47,10 @@ freeaddrinfo(res);
 // ---------------------------------------------------------------------- //
 // PUBLICAR EL SERVIDOR (LISTEN) //
 // ---------------------------------------------------------------------- //
-listen(sd, 16);
+listen(sd, 2);
 
+while(true)
+{
 // ---------------------------------------------------------------------- //
 // GESTION DE LAS CONEXIONES AL SERVIDOR //
 // ---------------------------------------------------------------------- //
@@ -69,18 +71,23 @@ std::cout << "CONEXION DESDE IP: " << host << " PUERTO: " << service
 // ---------------------------------------------------------------------- //
 // GESTION DE LA CONEXION CLIENTE //
 // ---------------------------------------------------------------------- //
-char buffer[80];
 
-ssize_t bytes = recv(sd_client, (void *) buffer, sizeof(char)*79, 0);
+  bool detector = false;
+  while(!detector)
+  {
+    char buffer[80];
 
-if ( bytes <= 0 )
-{
-return 0;
+    ssize_t bytes = recv(sd_client, (void *) buffer, sizeof(char)*79, 0);
+
+    if ( bytes <= 0 )
+    {
+    std::cout << "Conexión terminada" << std::endl;
+    detector = true;
+    continue;
+    }
+
+    send(sd_client, (void *) buffer, bytes, 0);
+  }
 }
-
-std::cout << "MENSAJE: " << buffer << std::endl;
-
-send(sd_client, (void *) buffer, bytes, 0);
-
 return 0;
 }
