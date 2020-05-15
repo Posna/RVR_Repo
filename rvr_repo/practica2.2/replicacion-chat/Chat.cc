@@ -9,13 +9,13 @@ void ChatMessage::to_bin()
 
     char* tmp = _data;
 
-    memcpy(tmp, type, 1);
+    memcpy(tmp, &type, 1);
     tmp += sizeof(uint8_t);
 
-    memcpy(tmp, nick, 8);
+    memcpy(tmp, &nick, 8);
     tmp += 8*sizeof(char);
 
-    memcpy(tmp, message, 80);
+    memcpy(tmp, &message, 80);
     tmp += 80*sizeof(char);
 }
 
@@ -29,13 +29,13 @@ int ChatMessage::from_bin(char * bobj)
 
     char* tmp = _data;
 
-    memcpy(type, tmp, 1);
+    memcpy(&type, tmp, 1);
     tmp += sizeof(uint8_t);
 
-    memcpy(nick, tmp, 8);
+    memcpy(&nick, tmp, 8);
     tmp += 8*sizeof(char);
 
-    memcpy(message, tmp, 80);
+    memcpy(&message, tmp, 80);
     tmp += 80*sizeof(char);
     return 0;
 }
@@ -49,19 +49,19 @@ void ChatServer::do_messages()
   // - LOGIN: Añadir al vector clients
   // - LOGOUT: Eliminar del vector clients
   // - MESSAGE: Reenviar el mensaje a todos los clientes (menos el emisor)
-    char buffer[MESSAGE_SIZE];
+    char buffer[ChatMessage::MESSAGE_SIZE];
     while (true)
     {
       ChatMessage cm;
       Socket* s;
-      socket.recv(&cm, &s);
+      socket.recv(cm, s);
       switch(cm.type)
       {
         case ChatMessage::LOGIN:
         clients.push_back(s);
         break;
 
-        case ChatMessage::LOGOUT;
+        case ChatMessage::LOGOUT:{
         auto it = clients.begin();
         while(it != clients.end() && *it != s)
         {
@@ -74,8 +74,9 @@ void ChatServer::do_messages()
         else{
           clients.erase(it);
           delete *it;
-          it = nullptr;
+          *it = nullptr;
         }
+      }
         break;
 
         case ChatMessage::MESSAGE:
@@ -83,7 +84,7 @@ void ChatServer::do_messages()
         while(it != clients.end())
         {
           if(*it != s)
-            socket.send(cm, *it);
+            socket.send(cm, *(*it));
           it++;
         }
         break;
@@ -134,7 +135,7 @@ void ChatClient::net_thread()
       //Mostrar en pantalla el mensaje de la forma "nick: mensaje"
       ChatMessage cm;
       Socket* s;
-      socket.recv(&cm);
+      socket.recv(cm);
       std::cout << cm.nick << ": " << cm.message << "\n";
     }
 }
