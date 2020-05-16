@@ -54,7 +54,9 @@ void ChatServer::do_messages()
     {
       ChatMessage cm;
       Socket* s;
+      std::cout << "Pre recv\n";
       socket.recv(cm, s);
+      std::cout << "Mensaje\n";
       switch(cm.type)
       {
         case ChatMessage::LOGIN:
@@ -95,7 +97,6 @@ void ChatServer::do_messages()
 void ChatClient::login()
 {
     std::string msg;
-
     ChatMessage em(nick, msg);
     em.type = ChatMessage::LOGIN;
 
@@ -124,6 +125,7 @@ void ChatClient::input_thread()
         ChatMessage cm (nick, msg);
         cm.type = ChatMessage::MESSAGE;
         socket.send(cm, socket);
+        std::cout << "Enviado mensaje\n";
     }
 }
 

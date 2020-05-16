@@ -20,6 +20,7 @@ Socket::Socket(const char * address, const char * port):sd(-1)
     }
 
     sd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+
     if(sd < 0)
     {
       std::cerr << "socket error: \n";
@@ -30,17 +31,21 @@ Socket::Socket(const char * address, const char * port):sd(-1)
     sa_len = sizeof(struct sockaddr);
     getnameinfo(&sa, sa_len, host, NI_MAXHOST, service,
       NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
+    if(bind()!=0){
+      std::cerr << "bind: " << std::endl;
+    }
 }
 
 int Socket::recv(Serializable &obj, Socket * &sock)
 {
     struct sockaddr sa;
+    std::cout << "Esperando mensaje\n";
     socklen_t sa_len = sizeof(struct sockaddr);
-
+    std::cout << "Esperando mensaje\n";
     char buffer[MAX_MESSAGE_SIZE];
-
+    std::cout << "Esperando mensaje\n";
     ssize_t bytes = ::recvfrom(sd, buffer, MAX_MESSAGE_SIZE, 0, &sa, &sa_len);
-
+    std::cout << "Mensaje ha llegado\n";
     if ( bytes <= 0 )
     {
         return -1;
@@ -63,11 +68,12 @@ int Socket::send(Serializable& obj, const Socket& sock)
     socklen_t client_len = sizeof(struct sockaddr);
     char host[NI_MAXHOST];
     char service[NI_MAXSERV];
-
+    std::cout << sock.sd;
     getnameinfo(&client_addr, client_len, host, NI_MAXHOST, service,
     NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
+    std::cout << "que lo envioooo\n";
+    return sendto(sock.sd, obj.data(), obj.size(), 0, &sock.sa, sock.sa_len);
 
-    sendto(sock.sd, obj.data(), obj.size(), 0, &client_addr, client_len);
     //Serializar el objeto
     //Enviar el objeto binario a sock usando el socket sd
 }

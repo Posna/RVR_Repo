@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 
     pthread_attr_t attr;
     pthread_t id;
-
+    
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
@@ -28,4 +28,3 @@ int main(int argc, char **argv)
 
     ec.input_thread();
 }
-
