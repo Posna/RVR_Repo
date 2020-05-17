@@ -12,13 +12,15 @@ Socket::Socket(const char * address, const char * port):sd(-1)
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_protocol = IPPROTO_UDP;
 
     int rc = getaddrinfo(address, port, &hints, &res);
     if ( rc != 0 )
     {
     std::cerr << "getaddrinfo: " << gai_strerror(rc) << std::endl;
     }
-
+    sa = *res->ai_addr;
+    sa_len = res->ai_addrlen;
     sd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 
     if(sd < 0)
@@ -26,26 +28,16 @@ Socket::Socket(const char * address, const char * port):sd(-1)
       std::cerr << "socket error: \n";
     }
 
-    char host[NI_MAXHOST];
-    char service[NI_MAXSERV];
-    sa_len = sizeof(struct sockaddr);
-    getnameinfo(&sa, sa_len, host, NI_MAXHOST, service,
-      NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
-    if(bind()!=0){
-      std::cerr << "bind: " << std::endl;
-    }
+
+    freeaddrinfo(res);
 }
 
 int Socket::recv(Serializable &obj, Socket * &sock)
 {
     struct sockaddr sa;
-    std::cout << "Esperando mensaje\n";
     socklen_t sa_len = sizeof(struct sockaddr);
-    std::cout << "Esperando mensaje\n";
     char buffer[MAX_MESSAGE_SIZE];
-    std::cout << "Esperando mensaje\n";
-    ssize_t bytes = ::recvfrom(sd, buffer, MAX_MESSAGE_SIZE, 0, &sa, &sa_len);
-    std::cout << "Mensaje ha llegado\n";
+    ssize_t bytes = ::recvfrom(sd, (void *)buffer, MAX_MESSAGE_SIZE, 0, &sa, &sa_len);
     if ( bytes <= 0 )
     {
         return -1;
@@ -64,15 +56,10 @@ int Socket::recv(Serializable &obj, Socket * &sock)
 int Socket::send(Serializable& obj, const Socket& sock)
 {
     obj.to_bin();
-    struct sockaddr client_addr;
-    socklen_t client_len = sizeof(struct sockaddr);
-    char host[NI_MAXHOST];
-    char service[NI_MAXSERV];
-    std::cout << sock.sd;
-    getnameinfo(&client_addr, client_len, host, NI_MAXHOST, service,
-    NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
-    std::cout << "que lo envioooo\n";
-    return sendto(sock.sd, obj.data(), obj.size(), 0, &sock.sa, sock.sa_len);
+
+    int r = sendto(sd, (char *)obj.data(), obj.size(), 0, &sock.sa, sock.sa_len);
+
+    return r;
 
     //Serializar el objeto
     //Enviar el objeto binario a sock usando el socket sd
