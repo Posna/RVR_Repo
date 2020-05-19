@@ -63,25 +63,27 @@ void ChatServer::do_messages()
       switch(cm.type)
       {
         case ChatMessage::LOGIN:
+        printf("%s Se ha conectado\n", &cm.nick[0]);
         clients.push_back(s);
         break;
 
         case ChatMessage::LOGOUT:{
-        auto it = clients.begin();
-        while(it != clients.end() && !(*(*it) == *s))
-        {
-          it++;
+          auto it = clients.begin();
+          while(it != clients.end() && !(*(*it) == *s))
+          {
+            it++;
+          }
+          if(it == clients.end())
+          {
+            printf("No está conectado\n");
+          }
+          else{
+            printf("%s Se ha desconectado\n", &cm.nick[0]);
+            clients.erase(it);
+            delete *it;
+            //*it = nullptr;
+          }
         }
-        if(it == clients.end())
-        {
-          printf("No está conectado\n");
-        }
-        else{
-          clients.erase(it);
-          delete *it;
-          *it = nullptr;
-        }
-      }
         break;
 
         case ChatMessage::MESSAGE:
@@ -109,17 +111,19 @@ void ChatClient::login()
 
 void ChatClient::logout()
 {
-  std::string msg;
+  std::string msg("-SE HA DESCONECTADO-");
 
   ChatMessage em(nick, msg);
-  em.type = ChatMessage::LOGOUT;
+  em.type = ChatMessage::MESSAGE;
+  socket.send(em, socket);
 
+  em.type = ChatMessage::LOGOUT;
   socket.send(em, socket);
 }
 
 void ChatClient::input_thread()
 {
-    while (true)
+    while (!terminar)
     {
         // Leer stdin con std::getline
         // Enviar al servidor usando socket
@@ -128,13 +132,18 @@ void ChatClient::input_thread()
 
         ChatMessage cm (nick, msg);
         cm.type = ChatMessage::MESSAGE;
-        socket.send(cm, socket);
+        if(msg.compare("/q") == 0){
+          logout();
+          terminar = true;
+        }
+        else
+          socket.send(cm, socket);
     }
 }
 
 void ChatClient::net_thread()
 {
-    while(true)
+    while(!terminar)
     {
       //Recibir Mensajes de red
       //Mostrar en pantalla el mensaje de la forma "nick: mensaje"

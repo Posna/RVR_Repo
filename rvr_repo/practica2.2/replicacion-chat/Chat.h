@@ -122,6 +122,10 @@ public:
     void net_thread();
 
 private:
+    /**
+     * Boleano para saber cuando sale del chat
+     */
+     bool terminar = false;
 
     /**
      * Socket para comunicar con el servidor
@@ -133,4 +137,3 @@ private:
      */
     std::string nick;
 };
-
