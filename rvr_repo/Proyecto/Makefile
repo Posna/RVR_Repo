@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-g -I. -std=c++11 -I/usr/include/SDL2 -D_REENTRANT
-DEPS = Game.h Vector2D.h Texture.h Ball.h
-OBJ = Game.o Vector2D.o Texture.o Ball.o
+DEPS = Vector2D.h Texture.h Ball.h Game.h
+OBJ = Vector2D.o Texture.o Ball.o Game.o
 LIBS=-lpthread -lm -lX11 -std=c++11 -lSDL2 -lSDL2_image -lSDL2_gfx
 SDL = `sdl-config --cflags --libs sdl2`
 

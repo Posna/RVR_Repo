@@ -1,19 +1,22 @@
 #include <unistd.h>
 #include <string>
-#include <SDL.h>
-#include <SDL_image.h>
-#include "Texture.h"
-#include "Vector2D.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include "Ball.h"
 
-
-enum TexturesName{Ball}; //Numero de cada textura
-const int WIN_WIDTH = 800;
-const int WIN_HEIGHT = 600;
+enum TexturesName{Logo}; //Numero de cada textura
+const int WIN_WIDTH = 1200;
+const int WIN_HEIGHT = 900;
 const int NUM_TEXTURES = 1; //numero de texturas a cargar
 const std::string RUTA = "..\\images\\";
 const uint32_t FRAME_RATE = 5;
 
+//Dimension del nivel
+const int LEVEL_WIDTH = 2000;
+const int LEVEL_HEIGHT = 2000;
 
+
+//class Ball;
 
 class Game {
 private:
@@ -26,8 +29,10 @@ private:
 		int col;
 	};
 	Texture* texturas[NUM_TEXTURES]; //Array de las texturas
-	TexturesAtributes atributos[NUM_TEXTURES] = { "ball.png", 1, 1};
-
+	TexturesAtributes atributos[NUM_TEXTURES] = { "sdl_logo.bmp", 1, 1};
+	SDL_Rect cam = { 0, 0, WIN_WIDTH, WIN_HEIGHT };
+	SDL_Surface* p = NULL;
+	Ball* player = nullptr;
 public:
 	Game();
 	~Game();
@@ -35,4 +40,5 @@ public:
 	void render() const;
 	void update();
 	void handleEvents();
+	//void apply_surface(Vector2D v, SDL_Surface* source
 };

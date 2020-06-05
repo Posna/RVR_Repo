@@ -1,4 +1,3 @@
-#include <SDL.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include "Game.h"

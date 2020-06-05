@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <string.h>
+//#include "Ball.h"
 
 
 using namespace std;
@@ -10,22 +11,29 @@ Game::Game() {
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 	window = SDL_CreateWindow("Edgar.io", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_SHOWN);
+	//SDL_RenderSetLogicalSize(WIN_WIDTH, WIN_HEIGHT);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (window == nullptr || renderer == nullptr)
     printf("Error loading the SDL window or renderer"); //Esto deberia dar un error
 
 	//Inicializacion de las texturas
-	/*for (int i = 0; i < NUM_TEXTURES; i++) {
-		texturas[i] = new Texture(renderer, (RUTA + atributos[i].nombre), atributos[i].row, atributos[i].col);
-	}*/
+	for (int i = 0; i < NUM_TEXTURES; i++) {
+		texturas[i] = new Texture(renderer, atributos[i].nombre, atributos[i].row, atributos[i].col);
+	}
+
+	player = new Ball(Vector2D(50, 300), 10);
 
   /* INICIALIZACION DE TODO DEL JUEGO */
 }
 
 void Game::render() const{
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderClear(renderer);
 
+
   /* Todos los renders aqui*/
+	player->render(renderer);
+
 
 	SDL_RenderPresent(renderer);
 }
@@ -55,13 +63,13 @@ void Game::run() {
 }
 
 void Game::update() {
-
+	player->update();
 }
 
 
 
 Game::~Game() {
-
+	delete player;
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
