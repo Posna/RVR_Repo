@@ -2,9 +2,9 @@
 #include "Vector2D.h"
 #include <math.h>
 
-int Vector2D::getX() const{ return this->x;}
+uint16_t Vector2D::getX() const{ return this->x;}
 
-int Vector2D::getY() const{ return this->y; }
+uint16_t Vector2D::getY() const{ return this->y; }
 
 void Vector2D::normaliza() {
 	double mag = sqrt(pow(x, 2) + pow(y, 2));

@@ -50,6 +50,8 @@ void Game::handleEvents() {
 	while (SDL_PollEvent(&event) && !exit) {
 		if (event.type == SDL_QUIT)
       exit = true;
+		if(event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_UP)
+			player->addRadius(1);
 
 	}
 }
