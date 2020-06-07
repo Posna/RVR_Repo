@@ -5,6 +5,7 @@
 #include <vector>
 #include "Vector2D.h"
 #include "Texture.h"
+#include "Socket.h"
 
 
 enum TexturesName{Logo}; //Numero de cada textura
@@ -36,7 +37,12 @@ private:
 	SDL_Rect cam = { 0, 0, WIN_WIDTH, WIN_HEIGHT };
 	SDL_Surface* p = NULL;
 	Ball* player = nullptr;
+	Socket socket;
 	std::vector<Ball*> bolitas;// = {new Ball(Vector2D(1,10)), new Ball(Vector2D(1,30)), new Ball(Vector2D(1,50))};
+	void sendPos();
+	void login();
+	void logout();
+	void recieve_information();
 public:
 	Game();
 	~Game();

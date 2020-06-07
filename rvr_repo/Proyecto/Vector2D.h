@@ -16,6 +16,7 @@ public:
 	int getX() const;
 	int getY() const;
 	void normaliza();
+	float magnitude();
 	Vector2D operator+(const Vector2D& v) const;
 	Vector2D operator-(const Vector2D& v) const;
 	Vector2D operator*(double d) const;

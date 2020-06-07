@@ -14,6 +14,10 @@ void Vector2D::normaliza() {
 	}
 }
 
+float Vector2D::magnitude()
+{
+	return sqrt(pow(x, 2) + pow(y, 2));
+}
 Vector2D Vector2D::operator+(const Vector2D& v) const {
 	Vector2D r;
 	r.x = this->x + v.x;

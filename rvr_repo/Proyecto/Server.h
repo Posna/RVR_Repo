@@ -23,9 +23,10 @@ public:
      *  Thread principal del servidor recive mensajes en el socket y
      *  lo distribuye a los clientes. Mantiene actualizada la lista de clientes
      */
-    void do_messages();
-
-    void game();
+    void recieve_messages();
+    void update();
+    void collision_detecttion();
+    void send_positions();
 
 private:
     /**

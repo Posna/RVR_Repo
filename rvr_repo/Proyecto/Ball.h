@@ -11,7 +11,9 @@ public:
   {
       LOGIN   = 0,
       POSITION = 1,
-      LOGOUT  = 2
+      LOGOUT  = 2,
+      DEAD = 3,
+      EAT = 4
   };
 
   Ball(Vector2D pos, Texture* t, uint16_t radio = 5);
@@ -36,6 +38,9 @@ public:
   void setPos(Vector2D v);
 
   void setGame(Game* g);
+
+  void setType(uint8_t t);
+  uint8_t getType();
 private:
   Game* g_;
   Texture* texture_;

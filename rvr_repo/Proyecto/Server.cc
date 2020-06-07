@@ -4,7 +4,7 @@
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-void Server::do_messages()
+void Server::recieve_messages()
 {
   //Recibir Mensajes en y en función del tipo de mensaje
   // - LOGIN: Añadir al vector clients
@@ -58,18 +58,62 @@ void Server::do_messages()
         if(it != clients.end()){
           jugadores[i].setPos(cm.getPos());
         }
+
         break;
       }
     }
 }
 
-void Server::game(){
-  while(){
-
+void Server::update(){
+  while(true){
+    collision_detection();
+    send_positions();
   }
 
 }
 
+void Server::collision_detection()
+{
+  int x = 0, y = 0;
+  for (Ball o1 : jugadores)
+  {
+    for (Ball o2 : jugadores)
+    {
+      if (o1 != o2)
+      {
+        Vector2D aux = o1.getPos() - o2.getPos();
+        if((o1.getRadius() > o2.getRadius() + o1.getRadius()/4)&&
+        (aux.magnitude() < o1.getRadius() + o2.getRadius()))
+        {
+          o2.setType(Ball::DEAD);
+          socket.send(o2, clients[y]);
+          o1.setType(Ball::EAT);
+          o1.addRadius(o2.getRadius());
+          socket.send(o1, clients[x]);
+        }
+      }
+      y++;
+    }
+    x++;
+  }
+}
+
+void Server::send_positions()
+{
+  int i = 0;
+  for (Ball o1 : jugadores)
+  {
+    for (Ball o2 : jugadores)
+    {
+      if (o1 != o2)
+      {
+        o2.setType(Ball::POSITION);
+        socket.send(o2, clients[i]);
+      }
+    }
+    i++;
+  }
+}
 /*void ChatClient::login()
 {
     std::string msg("-SE HA UNIDO-");

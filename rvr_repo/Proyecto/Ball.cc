@@ -111,3 +111,13 @@ void Ball::setPos(Vector2D v){
 void Ball::setGame(Game* g){
   g_ = g;
 }
+
+void Ball::setType(uint8_t t)
+{
+  type = t;
+}
+
+uint8_t Ball::getType()
+{
+  return type;
+}

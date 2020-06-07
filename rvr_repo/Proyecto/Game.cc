@@ -5,7 +5,7 @@
 using namespace std;
 typedef unsigned int uint;
 
-Game::Game() {
+Game::Game(const char* s, const char* p): socket(s,p) {
 	Vector2D origen(0, 0);
 
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -59,6 +59,7 @@ void Game::handleEvents() {
 void Game::run() {
 	uint32_t startTime, frameTime;
 	startTime = SDL_GetTicks();
+	login();
 	//login a server
 	while (!exit) {
 			handleEvents();
@@ -66,18 +67,58 @@ void Game::run() {
 			if (frameTime >= FRAME_RATE) {
 				update(frameTime); // Actualiza el estado de todos los objetos del juego
 				startTime = SDL_GetTicks();
+				sendPos();
+				//Envío de posicion
 			}
 			render();
 	}
-
+	logout();
 }
 
 void Game::update(uint32_t frameTime) {
 	player->update(frameTime);
 }
 
+void Game::sendPos()
+{
+	player.setType(Ball::POSITION);
+	socket.send(player, socket);
+}
 
+void Game::login()
+{
+	player.setType(Ball::LOGIN);
+	socket.send(player, socket);
+}
 
+void Game::logout()
+{
+	player.setType(Ball::LOGOUT);
+	socket.send(player, socket);
+}
+
+void Game::recieve_information()
+{
+    while(!exit)
+    {
+			Ball b;
+			socket.recv(b);
+
+			for (Ball ball : bolitas)
+			{
+				/*if (b == ball)
+				{
+					ball = b;
+				}*/
+			}
+      //Recibir Mensajes de red
+      //Mostrar en pantalla el mensaje de la forma "nick: mensaje"
+      /*ChatMessage cm;
+      Socket* s;
+      socket.recv(cm);
+      std::cout << &cm.nick[0] << ": " << &cm.message[0] << "\n";*/
+    }
+}
 Game::~Game() {
 	delete player;
 	SDL_DestroyRenderer(renderer);
