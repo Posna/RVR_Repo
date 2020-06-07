@@ -1,6 +1,5 @@
-#include "Game.h"
 #include <string.h>
-//#include "Ball.h"
+#include "Ball.h"
 
 
 using namespace std;
@@ -21,7 +20,10 @@ Game::Game() {
 		texturas[i] = new Texture(renderer, atributos[i].nombre, atributos[i].row, atributos[i].col);
 	}
 
-	player = new Ball(Vector2D(50, 300), 10);
+	//Bolitas de prueba
+	bolitas = {new Ball(Vector2D(500, 300)), new Ball(Vector2D(1300, 10)), new Ball(Vector2D(1700, 10))};
+
+	player = new Ball(Vector2D(500, 300), true, 10);
 
   /* INICIALIZACION DE TODO DEL JUEGO */
 }
@@ -33,6 +35,11 @@ void Game::render() const{
 
   /* Todos los renders aqui*/
 	player->render(renderer);
+	player->desfase(player->getPos() - Vector2D(WIN_WIDTH/2, WIN_HEIGHT/2));
+	for(int i = 0; i < bolitas.size(); i++){
+		bolitas[i]->desfase(player->getPos()- Vector2D(WIN_WIDTH/2, WIN_HEIGHT/2));
+		bolitas[i]->render(renderer);
+	}
 
 
 	SDL_RenderPresent(renderer);
@@ -54,7 +61,7 @@ void Game::run() {
 			handleEvents();
 			frameTime = SDL_GetTicks() - startTime; // Tiempo desde última actualización
 			if (frameTime >= FRAME_RATE) {
-				update(); // Actualiza el estado de todos los objetos del juego
+				update(frameTime); // Actualiza el estado de todos los objetos del juego
 				startTime = SDL_GetTicks();
 			}
 			render();
@@ -62,8 +69,8 @@ void Game::run() {
 
 }
 
-void Game::update() {
-	player->update();
+void Game::update(uint32_t frameTime) {
+	player->update(frameTime);
 }
 
 
