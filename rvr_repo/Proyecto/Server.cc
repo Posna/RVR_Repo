@@ -22,7 +22,7 @@ void Server::do_messages()
       switch(cm.type)
       {
         case Ball::LOGIN:
-        //printf("%s Se ha conectado\n", &cm.nick[0]);
+        printf("Se ha conectado\n");
         clients.push_back(s);
         jugadores.push_back(cm);
         break;
@@ -40,7 +40,7 @@ void Server::do_messages()
             printf("No está conectado\n");
           }
           else{
-            printf("%s Se ha desconectado\n", &cm.nick[0]);
+            //printf("%s Se ha desconectado\n", &cm.nick[0]);
             clients.erase(it);
             jugadores.erase(jugadores.begin()+i);
             delete *it;
@@ -50,14 +50,13 @@ void Server::do_messages()
         break;
 
         case Ball::POSITION:
+        int i = 0;
         auto it = clients.begin();
-        while (it != clients.end() && (*it)) {
-          /* code */
+        while (it != clients.end() && !((*(*it)) == *s)) {
+          i++;
         }
-        for (Socket* a: clients){
-          if((*a == *s)){
-            socket.send(cm, *a);
-          }
+        if(it != clients.end()){
+          jugadores[i].setPos(cm.getPos());
         }
         break;
       }

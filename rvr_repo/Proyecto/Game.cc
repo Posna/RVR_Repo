@@ -59,6 +59,7 @@ void Game::handleEvents() {
 void Game::run() {
 	uint32_t startTime, frameTime;
 	startTime = SDL_GetTicks();
+	//login a server
 	while (!exit) {
 			handleEvents();
 			frameTime = SDL_GetTicks() - startTime; // Tiempo desde última actualización
