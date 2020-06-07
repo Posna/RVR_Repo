@@ -48,7 +48,7 @@ void Ball::to_bin(){
   _size = MESSAGE_SIZE;
   char* tmp = _data;
 
-  memcpy(tmp, &type, 1);
+  memcpy(tmp, &type, sizeof(uint8_t));
   tmp += sizeof(uint8_t);
   memcpy(tmp, &pos_.getX(), sizeof(uint16_t));
   tmp += sizeof(uint16_t);
@@ -79,6 +79,8 @@ void Ball::from_bin(char * data){
 
   memcpy(&r, tmp, sizeof(uint16_t));
 
+  radio_ = r;
+  pos_ = Vector2D(x, y);
 
 }
 
