@@ -5,6 +5,7 @@
 
 #include "Serializable.h"
 #include "Socket.h"
+#include "Ball.h"
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -14,8 +15,10 @@
 class Server
 {
 public:
+    static const int NUM_BOLITAS = 50;
     Server(const char * s, const char * p): socket(s, p)
     {
+        id_actual = NUM_BOLITAS;
         socket.bind();
     };
 
@@ -25,16 +28,18 @@ public:
      */
     void recieve_messages();
     void update();
-    void collision_detecttion();
+    void collision_detection();
     void send_positions();
 
 private:
+    uint32_t id_actual;
     /**
      *  Lista de clientes conectados al servidor de Chat, representados por
      *  su socket
      */
     std::vector<Socket *> clients;
-    std::vectpr<Ball> jugadores;
+    std::vector<Ball> jugadores;
+    std::vector<Ball> comida;
     /**
      * Socket del servidor
      */

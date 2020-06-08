@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <signal.h>
+#include <thread>
 
 #include "Serializable.h"
 #include "Socket.h"
@@ -9,17 +10,12 @@
 
 int main(int argc, char **argv)
 {
-    sigset_t waitset;
-    int      sig;
 
     Server es(argv[1], argv[2]);
+    std::thread ms(&Server::recieve_messages, &es);
+    es.update();
 
-    es.do_messages();
-
-    sigemptyset(&waitset);
-    sigaddset(&waitset, SIGQUIT);
-
-    sigwait(&waitset, &sig);
+    ms.join();
 
     return 0;
 }

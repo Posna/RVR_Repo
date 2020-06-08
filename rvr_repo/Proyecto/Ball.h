@@ -1,11 +1,11 @@
 #include "Game.h"
 #include <SDL2/SDL2_gfxPrimitives.h>
-#include "Serializable"
+#include "Serializable.h"
 
 class Ball: public Serializable{
 
 public:
-  static const size_t MESSAGE_SIZE = sizeof(uint16_t)*3 + sizeof(uint8_t);
+  static const size_t MESSAGE_SIZE = sizeof(uint16_t)*3 + sizeof(uint8_t) + sizeof(uint32_t);
 
   enum MessageType
   {
@@ -13,11 +13,13 @@ public:
       POSITION = 1,
       LOGOUT  = 2,
       DEAD = 3,
-      EAT = 4
+      EAT = 4,
+      ID = 5
   };
 
+
   Ball(Vector2D pos, Texture* t, uint16_t radio = 5);
-  Ball(Vector2D pos, bool r = true, uint16_t radio = 5, uint32_t color = 0x550000FF); //Las primeras dos (0xFF..)son el alpha
+  Ball(Vector2D pos = Vector2D(0,0), bool r = true, uint16_t radio = 5, uint32_t color = 0x550000FF); //Las primeras dos (0xFF..)son el alpha
   ~Ball();
 
   void render(SDL_Renderer* cam);
@@ -25,7 +27,7 @@ public:
   void handleInput();
 
   virtual void to_bin();
-  virtual void from_bin(char * data);
+  virtual int from_bin(char * data);
 
   uint16_t getRadius();
   void setRadius(uint16_t r);
@@ -41,6 +43,9 @@ public:
 
   void setType(uint8_t t);
   uint8_t getType();
+
+  uint32_t getId();
+  void setId(uint32_t id);
 private:
   Game* g_;
   Texture* texture_;
@@ -54,4 +59,5 @@ private:
   uint8_t type;
   Vector2D pos_;
   uint16_t radio_;
+  uint32_t id_ = -1;
 };

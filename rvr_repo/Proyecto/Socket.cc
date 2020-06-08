@@ -56,9 +56,10 @@ int Socket::recv(Serializable &obj, Socket * &sock)
 int Socket::send(Serializable& obj, const Socket& sock)
 {
     obj.to_bin();
-
+    std::cout << sock << "\n";
+    printf("lo del sock %d\n", sock.sd);
     int r = sendto(sd, (char *)obj.data(), obj.size(), 0, &sock.sa, sock.sa_len);
-
+    printf("lo envio chachi\n");
     return r;
 
     //Serializar el objeto

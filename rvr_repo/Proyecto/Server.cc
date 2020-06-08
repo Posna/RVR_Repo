@@ -1,5 +1,4 @@
 #include "Server.h"
-#include "Ball.h"
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
@@ -19,12 +18,20 @@ void Server::recieve_messages()
       Ball cm;
       Socket* s;
       socket.recv(cm, s);
-      switch(cm.type)
+      switch(cm.getType())
       {
         case Ball::LOGIN:
         printf("Se ha conectado\n");
+        //std::cout << *s << "\n";
         clients.push_back(s);
         jugadores.push_back(cm);
+        printf("Proceso de conectarse casi bien\n");
+        cm.setId(id_actual);
+        id_actual++;
+        cm.setType(Ball::ID);
+        printf("Ojo que envia\n");
+        socket.send(cm, *clients.back());
+        printf("Proceso de conectarse bien\n");
         break;
 
         case Ball::LOGOUT:{
@@ -79,17 +86,17 @@ void Server::collision_detection()
   {
     for (Ball o2 : jugadores)
     {
-      if (o1 != o2)
+      if (o1.getId() != o2.getId())
       {
         Vector2D aux = o1.getPos() - o2.getPos();
         if((o1.getRadius() > o2.getRadius() + o1.getRadius()/4)&&
         (aux.magnitude() < o1.getRadius() + o2.getRadius()))
         {
           o2.setType(Ball::DEAD);
-          socket.send(o2, clients[y]);
+          socket.send(o2, *clients[y]);
           o1.setType(Ball::EAT);
           o1.addRadius(o2.getRadius());
-          socket.send(o1, clients[x]);
+          socket.send(o1, *clients[x]);
         }
       }
       y++;
@@ -105,10 +112,10 @@ void Server::send_positions()
   {
     for (Ball o2 : jugadores)
     {
-      if (o1 != o2)
+      if (o1.getId() != o2.getId())
       {
         o2.setType(Ball::POSITION);
-        socket.send(o2, clients[i]);
+        socket.send(o2, *clients[i]);
       }
     }
     i++;

@@ -39,6 +39,22 @@ void Ball::update(uint32_t frameTime){
   pos_ = pos_ + vel_ * (double)(50.0/(double)radio_);
 
   //comprobacion de que esta dentro del recuadro del juego
+  x = pos_.getX();
+  y = pos_.getY();
+  if(x < 0){
+    x = 0;
+  }
+  if(x > LEVEL_WIDTH){
+    x = LEVEL_WIDTH;
+  }
+
+  if(y < 0){
+    y = 0;
+  }
+  if(y > LEVEL_HEIGHT){
+    y = LEVEL_HEIGHT;
+  }
+  pos_ = Vector2D(x, y);
 }
 
 void Ball::to_bin(){
@@ -50,18 +66,25 @@ void Ball::to_bin(){
 
   memcpy(tmp, &type, sizeof(uint8_t));
   tmp += sizeof(uint8_t);
-  memcpy(tmp, &pos_.getX(), sizeof(uint16_t));
+  uint16_t x, y;
+  x = pos_.getX();
+  y = pos_.getY();
+  memcpy(tmp, &x, sizeof(uint16_t));
   tmp += sizeof(uint16_t);
-  memcpy(tmp, &pos_.getY(), sizeof(uint16_t));
+  memcpy(tmp, &y, sizeof(uint16_t));
   tmp += sizeof(uint16_t);
   memcpy(tmp, &radio_, sizeof(uint16_t));
   tmp += sizeof(uint16_t);
+  memcpy(tmp, &id_, sizeof(uint32_t));
+  tmp += sizeof(uint32_t);
+  printf("Vector2D(%d, %d) r: %d id: %d\n", pos_.getX(), pos_.getY(), radio_, id_);
+  printf("%d\n", *tmp);
 }
 
-void Ball::from_bin(char * data){
+int Ball::from_bin(char * data){
   alloc_data(MESSAGE_SIZE);
 
-  memcpy(static_cast<void *>(_data), bobj, MESSAGE_SIZE);
+  memcpy(static_cast<void *>(_data), data, MESSAGE_SIZE);
   _size = MESSAGE_SIZE;
   //Reconstruir la clase usando el buffer _data
 
@@ -78,9 +101,16 @@ void Ball::from_bin(char * data){
   tmp += sizeof(uint16_t);
 
   memcpy(&r, tmp, sizeof(uint16_t));
+  tmp += sizeof(uint16_t);
+
+  memcpy(&id_, tmp, sizeof(uint32_t));
 
   radio_ = r;
   pos_ = Vector2D(x, y);
+
+  printf("Vector2D(%d, %d) r: %d id: %d\n", pos_.getX(), pos_.getY(), radio_, id_);
+
+  return 0;
 
 }
 
@@ -100,7 +130,7 @@ void Ball::desfase(Vector2D d){
   desfase_ = d;
 }
 
-Vector2D Ball:getPos(){
+Vector2D Ball::getPos(){
   return pos_;
 }
 
@@ -120,4 +150,12 @@ void Ball::setType(uint8_t t)
 uint8_t Ball::getType()
 {
   return type;
+}
+
+uint32_t Ball::getId(){
+  return id_;
+}
+
+void Ball::setId(uint32_t id){
+  id_ = id;
 }

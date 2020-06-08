@@ -5,6 +5,8 @@
 using namespace std;
 typedef unsigned int uint;
 
+	std::mutex mutex_bolitas;
+
 Game::Game(const char* s, const char* p): socket(s,p) {
 	Vector2D origen(0, 0);
 
@@ -16,12 +18,12 @@ Game::Game(const char* s, const char* p): socket(s,p) {
     printf("Error loading the SDL window or renderer"); //Esto deberia dar un error
 
 	//Inicializacion de las texturas
-	for (int i = 0; i < NUM_TEXTURES; i++) {
-		texturas[i] = new Texture(renderer, atributos[i].nombre, atributos[i].row, atributos[i].col);
-	}
+	//for (int i = 0; i < NUM_TEXTURES; i++) {
+	//	texturas[i] = new Texture(renderer, atributos[i].nombre, atributos[i].row, atributos[i].col);
+	//}
 
 	//Bolitas de prueba
-	bolitas = {new Ball(Vector2D(500, 300)), new Ball(Vector2D(1300, 10)), new Ball(Vector2D(1700, 10))};
+	//bolitas = {new Ball(Vector2D(500, 300)), new Ball(Vector2D(1300, 10)), new Ball(Vector2D(1700, 10))};
 
 	player = new Ball(Vector2D(500, 300), true, 10);
 
@@ -36,10 +38,12 @@ void Game::render() const{
   /* Todos los renders aqui*/
 	player->render(renderer);
 	player->desfase(player->getPos() - Vector2D(WIN_WIDTH/2, WIN_HEIGHT/2));
+	mutex_bolitas.lock();
 	for(int i = 0; i < bolitas.size(); i++){
 		bolitas[i]->desfase(player->getPos()- Vector2D(WIN_WIDTH/2, WIN_HEIGHT/2));
 		bolitas[i]->render(renderer);
 	}
+	mutex_bolitas.unlock();
 
 
 	SDL_RenderPresent(renderer);
@@ -50,8 +54,8 @@ void Game::handleEvents() {
 	while (SDL_PollEvent(&event) && !exit) {
 		if (event.type == SDL_QUIT)
       exit = true;
-		if(event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_UP)
-			player->addRadius(1);
+		//if(event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_UP)
+		//	player->addRadius(1);
 
 	}
 }
@@ -67,8 +71,7 @@ void Game::run() {
 			if (frameTime >= FRAME_RATE) {
 				update(frameTime); // Actualiza el estado de todos los objetos del juego
 				startTime = SDL_GetTicks();
-				sendPos();
-				//Envío de posicion
+				sendPos(); //Envío de posicion
 			}
 			render();
 	}
@@ -81,20 +84,20 @@ void Game::update(uint32_t frameTime) {
 
 void Game::sendPos()
 {
-	player.setType(Ball::POSITION);
-	socket.send(player, socket);
+	player->setType(Ball::POSITION);
+	socket.send(*player, socket);
 }
 
 void Game::login()
 {
-	player.setType(Ball::LOGIN);
-	socket.send(player, socket);
+	player->setType(Ball::LOGIN);
+	socket.send(*player, socket);
 }
 
 void Game::logout()
 {
-	player.setType(Ball::LOGOUT);
-	socket.send(player, socket);
+	player->setType(Ball::LOGOUT);
+	socket.send(*player, socket);
 }
 
 void Game::recieve_information()
@@ -104,13 +107,29 @@ void Game::recieve_information()
 			Ball b;
 			socket.recv(b);
 
-			for (Ball ball : bolitas)
-			{
-				/*if (b == ball)
+			switch (b.getType()) {
+				case Ball::POSITION:
+				mutex_bolitas.lock();
+				for (Ball* ball : bolitas)
 				{
-					ball = b;
-				}*/
+					if (b.getId() == ball->getId())
+					{
+						ball->setPos(b.getPos());
+					}
+				}
+				mutex_bolitas.unlock();
+				break;
+
+				case Ball::EAT:
+				player->setRadius(b.getRadius());
+				break;
+
+				case Ball::DEAD:
+				exit = true;
+				break;
+
 			}
+
       //Recibir Mensajes de red
       //Mostrar en pantalla el mensaje de la forma "nick: mensaje"
       /*ChatMessage cm;
