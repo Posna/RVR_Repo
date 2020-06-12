@@ -128,6 +128,10 @@ void Game::recieve_information()
 				exit = true;
 				break;
 
+				case Ball::ID:
+				player->setId(b.getId());
+				break;
+
 			}
 
       //Recibir Mensajes de red

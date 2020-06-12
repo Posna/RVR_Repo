@@ -22,7 +22,7 @@ public:
         socket.bind();
     };
 
-    /**
+    /*
      *  Thread principal del servidor recive mensajes en el socket y
      *  lo distribuye a los clientes. Mantiene actualizada la lista de clientes
      */

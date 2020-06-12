@@ -45,6 +45,7 @@ int Socket::recv(Serializable &obj, Socket * &sock)
 
     if ( sock != 0 )
     {
+	printf("Pasa por aqui\n");
         sock = new Socket(&sa, sa_len);
     }
 

@@ -78,7 +78,7 @@ void Ball::to_bin(){
   memcpy(tmp, &id_, sizeof(uint32_t));
   tmp += sizeof(uint32_t);
   printf("Vector2D(%d, %d) r: %d id: %d\n", pos_.getX(), pos_.getY(), radio_, id_);
-  printf("%d\n", *tmp);
+  //printf("%d\n", *tmp);
 }
 
 int Ball::from_bin(char * data){

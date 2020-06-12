@@ -14,24 +14,18 @@ void Server::recieve_messages()
 
     while (true)
     {
-      //cm = ChatMessage();
       Ball cm;
-      Socket* s;
+      Socket* s = &socket;
       socket.recv(cm, s);
       switch(cm.getType())
       {
         case Ball::LOGIN:
-        printf("Se ha conectado\n");
-        //std::cout << *s << "\n";
         clients.push_back(s);
         jugadores.push_back(cm);
-        printf("Proceso de conectarse casi bien\n");
         cm.setId(id_actual);
         id_actual++;
         cm.setType(Ball::ID);
-        printf("Ojo que envia\n");
-        socket.send(cm, *clients.back());
-        printf("Proceso de conectarse bien\n");
+        socket.send(cm, *s);
         break;
 
         case Ball::LOGOUT:{
