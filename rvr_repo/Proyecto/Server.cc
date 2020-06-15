@@ -39,6 +39,19 @@ void Server::recieve_messages()
           mutex_clients.lock();
           //printf("preSend\n");
           socket.send(cm, *s);
+
+          cm.setType(Ball::LOGIN);
+          int i = 0;
+          for (auto it = clients.begin(); it < clients.end(); it++)
+          {
+            if (!(*(*it) == *s))
+            {
+              socket.send(cm, (*(*it)));
+              jugadores[i].setType(Ball::LOGIN);
+              socket.send(jugadores[i], *s);
+            }
+            i++;
+          }
           mutex_clients.unlock();
         }
         break;
@@ -82,7 +95,7 @@ void Server::recieve_messages()
         //mutex_clients.lock();
         auto it = clients.begin();
         //Probablemente este bucle se pueda cambiar usando los ID
-        while(jugadores.size() < i && cm.getId() != jugadores[i].getId()){
+        while(jugadores.size() > i && cm.getId() != jugadores[i].getId()){
           if(cm.getId() == 51){
             printf("ey\n");
           }
@@ -168,7 +181,9 @@ void Server::collision_detection()
             mutex_clients.unlock();
         }
       }
+      y++;
     }
+    x++;
   }
   //printf("unlock jugadores\n");
   mutex_jugadores.unlock();

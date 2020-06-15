@@ -23,7 +23,7 @@ Ball::~Ball(){
 
 }
 
-void Ball::render(SDL_Renderer* renderer){
+void Ball::render(SDL_Renderer* renderer) const{
   filledCircleColor(renderer, pos_.getX() - desfase_.getX(), pos_.getY() - desfase_.getY(), radio_, color_);
 
 
@@ -36,25 +36,32 @@ void Ball::update(uint32_t frameTime){
   vel_ = Vector2D(x - WIN_WIDTH/2, y - WIN_HEIGHT/2);
   vel_.normaliza();
 
-  pos_ = pos_ + vel_ * (double)(50.0/(double)radio_);
+  pos_ = pos_ + vel_ * 0.5;
 
   //comprobacion de que esta dentro del recuadro del juego
   x = pos_.getX();
   y = pos_.getY();
+
+  bool si = false;
   if(x < 0){
+    si = true;
     x = 0;
   }
   if(x > LEVEL_WIDTH){
+    si = true;
     x = LEVEL_WIDTH;
   }
 
   if(y < 0){
+    si = true;
     y = 0;
   }
   if(y > LEVEL_HEIGHT){
+    si = true;
     y = LEVEL_HEIGHT;
   }
-  pos_ = Vector2D(x, y);
+  if(si)
+    pos_ = Vector2D(x, y);
 }
 
 void Ball::to_bin(){

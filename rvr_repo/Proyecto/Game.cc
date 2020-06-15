@@ -133,6 +133,11 @@ void Game::recieve_information()
 				player->setId(b.getId());
 				break;
 
+				case Ball::LOGIN:
+				Ball aux = b;
+				aux.setColor(0x550000FF);
+				bolitas.push_back(&aux);
+				break;
 			}
 
       //Recibir Mensajes de red

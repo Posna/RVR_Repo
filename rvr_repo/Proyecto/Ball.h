@@ -22,7 +22,7 @@ public:
   Ball(Vector2D pos = Vector2D(0,0), bool r = true, uint16_t radio = 5, uint32_t color = 0x550000FF); //Las primeras dos (0xFF..)son el alpha
   ~Ball();
 
-  void render(SDL_Renderer* cam);
+  void render(SDL_Renderer* cam) const;
   void update(uint32_t frameTime);
   void handleInput();
 
@@ -44,6 +44,10 @@ public:
   void setType(uint8_t t);
   uint8_t getType();
 
+  void setColor(uint32_t color)
+  {
+    color_ = color;
+  }
   uint32_t getId();
   void setId(uint32_t id);
 private:
