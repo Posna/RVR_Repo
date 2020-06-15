@@ -125,6 +125,7 @@ void Game::recieve_information()
 				break;
 
 				case Ball::DEAD:
+				printf("Me he muerto\n");
 				exit = true;
 				break;
 

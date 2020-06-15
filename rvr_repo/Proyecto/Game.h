@@ -15,7 +15,7 @@ const int WIN_WIDTH = 800;
 const int WIN_HEIGHT = 600;
 const int NUM_TEXTURES = 1; //numero de texturas a cargar
 const std::string RUTA = "..\\images\\";
-const uint32_t FRAME_RATE = 16;
+const uint32_t FRAME_RATE = 5;
 
 //Dimension del nivel
 const int LEVEL_WIDTH = 2000;
@@ -41,7 +41,7 @@ private:
 	void sendPos();
 	void login();
 	void logout();
-	
+
 public:
 	Game(const char* s, const char* p);
 	~Game();

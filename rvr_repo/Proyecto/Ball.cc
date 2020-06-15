@@ -108,7 +108,7 @@ int Ball::from_bin(char * data){
   radio_ = r;
   pos_ = Vector2D(x, y);
 
-  printf("Vector2D(%d, %d) r: %d id: %d\n", pos_.getX(), pos_.getY(), radio_, id_);
+  //printf("Vector2D(%d, %d) r: %d id: %d\n", pos_.getX(), pos_.getY(), radio_, id_);
 
   return 0;
 
