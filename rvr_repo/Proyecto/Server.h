@@ -15,7 +15,7 @@
 class Server
 {
 public:
-    static const int NUM_BOLITAS = 50;
+    static const int NUM_BOLITAS = 100;
     Server(const char * s, const char * p): socket(s, p)
     {
         id_actual = NUM_BOLITAS;
@@ -30,6 +30,8 @@ public:
     void update();
     void collision_detection();
     void send_positions();
+
+    Ball getRandomBall();
 
 private:
     uint32_t id_actual;

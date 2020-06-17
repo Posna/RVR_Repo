@@ -116,6 +116,7 @@ void Game::recieve_information()
 						if (b.getId() == ball->getId())
 						{
 							ball->setPos(b.getPos());
+							ball->setRadius(b.getRadius());
 						}
 					}
 					mutex_bolitas.unlock();
