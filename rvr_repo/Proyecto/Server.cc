@@ -18,13 +18,12 @@ void Server::recieve_messages()
     while (true)
     {
       Ball cm;
-      Socket* s = &socket;
-      //printf("preRecv\n");
+      Socket* s;
       socket.recv(cm, s);
+
       switch(cm.getType())
       {
         case Ball::LOGIN:{
-
           mutex_clients.lock();
           clients.push_back(s);
           mutex_clients.unlock();
@@ -37,16 +36,14 @@ void Server::recieve_messages()
 
           cm.setType(Ball::ID);
           mutex_clients.lock();
-          //printf("preSend\n");
           socket.send(cm, *s);
-
           cm.setType(Ball::LOGIN);
           int i = 0;
           for (auto it = clients.begin(); it < clients.end(); it++)
           {
-            if (!(*(*it) == *s))
+            if (!((*(*it)) == *s))
             {
-              socket.send(cm, (*(*it)));
+              socket.send(cm, *(*it));
               jugadores[i].setType(Ball::LOGIN);
               socket.send(jugadores[i], *s);
             }
@@ -56,13 +53,12 @@ void Server::recieve_messages()
         }
         break;
 
+        //Hay que mandar mensaje a todos los jugadores de que un id se ha desconectado para que no lo pinten
         case Ball::LOGOUT:{
           int i = 0;
-          printf("que lo desconecto!\n");
-          printf("lockclientes\n");
           mutex_clients.lock();
           auto it = clients.begin();
-          while(it != clients.end() && !(*(*it) == *s))
+          while(it != clients.end() && !((*(*it)) == *s))
           {
             i++;
             it++;
@@ -70,51 +66,38 @@ void Server::recieve_messages()
           if(it == clients.end())
           {
             printf("No está conectado\n");
+            mutex_clients.unlock();
           }
           else{
-            printf("Se ha desconectado\n");
-            //mutex_clients.lock();
+            printf("Cliente %d desconectado\n", cm.getId());
             clients.erase(it);
-            //mutex_clients.unlock();
-            printf("lockJugadores\n");
+            cm.setType(Ball::DEAD);
+            socket.send(cm, *(*it));
+            mutex_clients.unlock();
+
             mutex_jugadores.lock();
             jugadores.erase(jugadores.begin()+i);
-            printf("unlockJugadores\n");
             mutex_jugadores.unlock();
             delete *it;
-            //*it = nullptr;
           }
-          printf("unlockclientes\n");
-          mutex_clients.unlock();
+          cm.setType(Ball::LOGOUT);
+          for(Socket* s1: clients){
+            socket.send(cm, *s1);
+          }
         }
         break;
 
         case Ball::POSITION:
         int i = 0;
-          mutex_jugadores.lock();
-        //mutex_clients.lock();
+        mutex_jugadores.lock();
         auto it = clients.begin();
-        //Probablemente este bucle se pueda cambiar usando los ID
         while(jugadores.size() > i && cm.getId() != jugadores[i].getId()){
-          if(cm.getId() == 51){
-            printf("ey\n");
-          }
           i++;
         }
-        /*while (it != clients.end() && !((*(*it)) == *s)) {
-          i++;
-          it++;
-        }
-        if(it != clients.end()){
-
-          jugadores[i].setPos(cm.getPos());
-
-        }*/
         if(i != jugadores.size()){
           jugadores[i].setPos(cm.getPos());
         }
         mutex_jugadores.unlock();
-        //mutex_clients.unlock();
         break;
       }
     }
@@ -132,12 +115,11 @@ void Server::collision_detection()
 {
   int x = 0, y = 0;
   mutex_jugadores.lock();
-  //printf("De momento bien\n");
-  /*for (Ball o1 : jugadores)
-  {
-    //for (Ball o2 : jugadores)
-    //{
-      /*if (o1.getId() != o2.getId())
+  for(auto it = jugadores.begin(); it != jugadores.end(); ++it){
+    Ball o1 = *it;
+    for(auto itt = jugadores.begin(); itt != jugadores.end(); ++itt){
+      Ball o2 = *itt;
+      if (o1.getId() != o2.getId())
       {
         Vector2D aux = o1.getPos() - o2.getPos();
         if((o1.getRadius() > o2.getRadius() + o1.getRadius()/4)&&
@@ -152,40 +134,10 @@ void Server::collision_detection()
           mutex_clients.unlock();
         }
       }
-      //y++;
-    //}
-    x++;
-  }*/
-    for(auto it = jugadores.begin(); it != jugadores.end(); ++it){
-      //Ball o1 = *it;
-      for(auto itt = jugadores.begin(); itt != jugadores.end(); ++itt){
-        //Ball o2 = *itt;
-        //printf("comparacion\n");
-        if ((*it).getId() != (*itt).getId())
-        {
-          //printf("distancias\n");
-          Vector2D aux = (*it).getPos() - (*itt).getPos();
-          if(((*it).getRadius() > (*itt).getRadius() + (*it).getRadius()/4)&&
-          (aux.magnitude() < (*it).getRadius() + (*itt).getRadius()))
-          {
-            //printf("lock\n");
-            mutex_clients.lock();
-            (*itt).setType(Ball::DEAD);
-            //printf("mensaje muerto\n");
-            socket.send((*itt), *clients[y]);
-            (*it).setType(Ball::EAT);
-            (*it).addRadius((*itt).getRadius());
-            //printf("mensaje comido\n");
-            socket.send((*it), *clients[x]);
-            //printf("unlock\n");
-            mutex_clients.unlock();
-        }
-      }
       y++;
     }
     x++;
   }
-  //printf("unlock jugadores\n");
   mutex_jugadores.unlock();
 }
 
@@ -193,29 +145,10 @@ void Server::send_positions()
 {
   int i = 0;
   mutex_jugadores.lock();
-  //printf("De momento bien2\n");
   for(auto it = jugadores.begin(); it != jugadores.end(); ++it){
-    //Ball o1 = *it;
+    Ball o1 = *it;
     for(auto itt = jugadores.begin(); itt != jugadores.end(); ++itt){
-      //Ball o2 = *itt;
-      if ((*it).getId() != (*itt).getId())
-      {
-        mutex_clients.lock();
-        //printf("lock\n");
-        (*itt).setType(Ball::POSITION);
-        //printf("que envia su pos!!!\n");
-        socket.send((*itt), *clients[i]);
-        //printf("eeeenviadaaa\n");
-        mutex_clients.unlock();
-        //printf("unlock\n");
-      }
-    }
-    i++;
-  }
-  /*for (Ball o1 : jugadores)
-  {
-    for (Ball o2 : jugadores)
-    {
+      Ball o2 = *itt;
       if (o1.getId() != o2.getId())
       {
         mutex_clients.lock();
@@ -225,62 +158,6 @@ void Server::send_positions()
       }
     }
     i++;
-  }*/
-  //printf("unlock jugadores\n");
+  }
   mutex_jugadores.unlock();
 }
-/*void ChatClient::login()
-{
-    std::string msg("-SE HA UNIDO-");
-    ChatMessage em(nick, msg);
-    em.type = ChatMessage::LOGIN;
-
-    socket.send(em, socket);
-    em.type = ChatMessage::MESSAGE;
-    socket.send(em, socket);
-}
-
-void ChatClient::logout()
-{
-  std::string msg("-SE HA DESCONECTADO-");
-
-  ChatMessage em(nick, msg);
-  em.type = ChatMessage::MESSAGE;
-  socket.send(em, socket);
-
-  em.type = ChatMessage::LOGOUT;
-  socket.send(em, socket);
-}
-
-void ChatClient::input_thread()
-{
-    while (!terminar)
-    {
-        // Leer stdin con std::getline
-        // Enviar al servidor usando socket
-        std::string msg;
-        std::getline(std::cin, msg);
-
-        ChatMessage cm (nick, msg);
-        cm.type = ChatMessage::MESSAGE;
-        if(msg.compare("/q") == 0){
-          logout();
-          terminar = true;
-        }
-        else
-          socket.send(cm, socket);
-    }
-}
-
-void ChatClient::net_thread()
-{
-    while(!terminar)
-    {
-      //Recibir Mensajes de red
-      //Mostrar en pantalla el mensaje de la forma "nick: mensaje"
-      ChatMessage cm;
-      Socket* s;
-      socket.recv(cm);
-      std::cout << &cm.nick[0] << ": " << &cm.message[0] << "\n";
-    }
-}*/

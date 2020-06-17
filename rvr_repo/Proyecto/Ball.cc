@@ -11,12 +11,16 @@ Ball::Ball(Vector2D pos, bool r, uint16_t radio, uint32_t color): pos_(pos),
   radio_(radio), color_(color)
 {
   if(r){
-    color_ = 0xFF;
-    color_ |= (rand() & 0xFF) << 8;
-    color_ |= (rand() & 0xFF) << 16;
-    color_ |= (rand() & 0xFF) << 24;
+    setRandomColor();
   }
 
+}
+
+Ball::Ball(const Ball& obj){
+  pos_ = obj.pos_;
+  radio_ = obj.radio_;
+  color_ = obj.color_;
+  id_ = obj.id_;
 }
 
 Ball::~Ball(){
@@ -84,7 +88,7 @@ void Ball::to_bin(){
   tmp += sizeof(uint16_t);
   memcpy(tmp, &id_, sizeof(uint32_t));
   tmp += sizeof(uint32_t);
-  printf("Vector2D(%d, %d) r: %d id: %d\n", pos_.getX(), pos_.getY(), radio_, id_);
+  //printf("Vector2D(%d, %d) r: %d id: %d\n", pos_.getX(), pos_.getY(), radio_, id_);
   //printf("%d\n", *tmp);
 }
 
@@ -121,7 +125,7 @@ int Ball::from_bin(char * data){
 
 }
 
-uint16_t Ball::getRadius(){
+const uint16_t Ball::getRadius(){
   return radio_;
 }
 
@@ -137,7 +141,7 @@ void Ball::desfase(Vector2D d){
   desfase_ = d;
 }
 
-Vector2D Ball::getPos(){
+const Vector2D Ball::getPos(){
   return pos_;
 }
 
@@ -154,12 +158,27 @@ void Ball::setType(uint8_t t)
   type = t;
 }
 
-uint8_t Ball::getType()
+const uint8_t Ball::getType()
 {
   return type;
 }
 
-uint32_t Ball::getId(){
+void Ball::setRandomColor(){
+  color_ = 0xFF;
+  color_ |= (rand() & 0xFF) << 8;
+  color_ |= (rand() & 0xFF) << 16;
+  color_ |= (rand() & 0xFF) << 24;
+}
+
+void Ball::setColor(uint32_t c){
+  color_ = c;
+}
+
+const uint32_t Ball::getColor(){
+  return color_;
+}
+
+const uint32_t Ball::getId(){
   return id_;
 }
 

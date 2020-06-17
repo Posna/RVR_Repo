@@ -109,43 +109,63 @@ void Game::recieve_information()
 
 			switch (b.getType()) {
 				case Ball::POSITION:
-				mutex_bolitas.lock();
-				for (Ball* ball : bolitas)
 				{
-					if (b.getId() == ball->getId())
+					mutex_bolitas.lock();
+					for (Ball* ball : bolitas)
 					{
-						ball->setPos(b.getPos());
+						if (b.getId() == ball->getId())
+						{
+							ball->setPos(b.getPos());
+						}
 					}
+					mutex_bolitas.unlock();
 				}
-				mutex_bolitas.unlock();
 				break;
 
 				case Ball::EAT:
-				player->setRadius(b.getRadius());
+				{
+					player->setRadius(b.getRadius());
+				}
 				break;
 
 				case Ball::DEAD:
-				printf("Me he muerto\n");
-				exit = true;
+				{
+					printf("Me he muerto\n");
+					exit = true;
+				}
 				break;
 
 				case Ball::ID:
-				player->setId(b.getId());
+				{
+					player->setId(b.getId());
+				}
 				break;
 
 				case Ball::LOGIN:
-				Ball aux = b;
-				aux.setColor(0x550000FF);
-				bolitas.push_back(&aux);
+				{
+					Ball* aux = new Ball(b);
+					aux->setRandomColor();
+					bolitas.push_back(aux);
+				}
 				break;
-			}
 
-      //Recibir Mensajes de red
-      //Mostrar en pantalla el mensaje de la forma "nick: mensaje"
-      /*ChatMessage cm;
-      Socket* s;
-      socket.recv(cm);
-      std::cout << &cm.nick[0] << ": " << &cm.message[0] << "\n";*/
+				case Ball::LOGOUT:
+				{
+					mutex_bolitas.lock();
+					auto it = bolitas.begin();
+					while (it != bolitas.end() && b.getId() != (*it)->getId())
+					{
+						++it;
+					}
+					if (it != bolitas.end())
+					{
+						bolitas.erase(it);
+					}
+					mutex_bolitas.unlock();
+				}
+				break;
+
+			}
     }
 }
 Game::~Game() {

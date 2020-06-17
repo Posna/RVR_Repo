@@ -18,8 +18,8 @@ const std::string RUTA = "..\\images\\";
 const uint32_t FRAME_RATE = 5;
 
 //Dimension del nivel
-const int LEVEL_WIDTH = 2000;
-const int LEVEL_HEIGHT = 2000;
+const int LEVEL_WIDTH = 700;
+const int LEVEL_HEIGHT = 700;
 
 
 class Ball;

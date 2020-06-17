@@ -20,6 +20,7 @@ public:
 
   Ball(Vector2D pos, Texture* t, uint16_t radio = 5);
   Ball(Vector2D pos = Vector2D(0,0), bool r = true, uint16_t radio = 5, uint32_t color = 0x550000FF); //Las primeras dos (0xFF..)son el alpha
+  Ball(const Ball& obj);
   ~Ball();
 
   void render(SDL_Renderer* cam) const;
@@ -29,26 +30,26 @@ public:
   virtual void to_bin();
   virtual int from_bin(char * data);
 
-  uint16_t getRadius();
+  const uint16_t getRadius();
   void setRadius(uint16_t r);
   void addRadius(uint16_t r);
   //Este metodo se usa para que el jugador sea el punto medio
   //y todo vaya en funcion del mismo
   void desfase(Vector2D d);
 
-  Vector2D getPos();
+  const Vector2D getPos();
   void setPos(Vector2D v);
 
   void setGame(Game* g);
 
   void setType(uint8_t t);
-  uint8_t getType();
+  const uint8_t getType();
 
-  void setColor(uint32_t color)
-  {
-    color_ = color;
-  }
-  uint32_t getId();
+  void setRandomColor();
+  void setColor(uint32_t c);
+  const uint32_t getColor();
+
+  const uint32_t getId();
   void setId(uint32_t id);
 private:
   Game* g_;
