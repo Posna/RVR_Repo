@@ -3,9 +3,9 @@
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-std::mutex mutex_clients;
-std::mutex mutex_jugadores;
-std::mutex mutex_comida;
+std::shared_mutex mutex_clients;
+std::shared_mutex mutex_jugadores;
+std::shared_mutex mutex_comida;
 
 void Server::recieve_messages()
 {
@@ -37,13 +37,13 @@ void Server::recieve_messages()
           clients.push_back(s);
           mutex_clients.unlock();
 
-          mutex_comida.lock();
+          mutex_comida.lock_shared();
           for(Ball b: comida){
             Ball aux = b;
             aux.setType(Ball::LOGIN);
             socket.send(aux, *s);
           }
-          mutex_comida.unlock();
+          mutex_comida.unlock_shared();
 
           mutex_jugadores.lock();
           cm.setId(id_actual);
@@ -52,7 +52,7 @@ void Server::recieve_messages()
           mutex_jugadores.unlock();
 
           cm.setType(Ball::ID);
-          mutex_clients.lock();
+          mutex_clients.lock_shared();
           socket.send(cm, *s);
           cm.setType(Ball::LOGIN);
           int i = 0;
@@ -66,14 +66,14 @@ void Server::recieve_messages()
             }
             i++;
           }
-          mutex_clients.unlock();
+          mutex_clients.unlock_shared();
         }
         break;
 
         //Hay que mandar mensaje a todos los jugadores de que un id se ha desconectado para que no lo pinten
         case Ball::LOGOUT:{
           int i = 0;
-          mutex_clients.lock();
+          mutex_clients.lock_shared();
           auto it = clients.begin();
           while(it != clients.end() && !((*(*it)) == *s))
           {
@@ -83,13 +83,15 @@ void Server::recieve_messages()
           if(it == clients.end())
           {
             printf("No está conectado\n");
-            mutex_clients.unlock();
+            mutex_clients.unlock_shared();
           }
           else{
             printf("Cliente %d desconectado\n", cm.getId());
             for(Socket* s1: clients){
               socket.send(cm, *s1);
             }
+            mutex_clients.unlock_shared();
+            mutex_clients.lock();
             clients.erase(it);
             cm.setType(Ball::DEAD);
             socket.send(cm, *s);
@@ -106,15 +108,18 @@ void Server::recieve_messages()
 
         case Ball::POSITION:
         int i = 0;
-        mutex_jugadores.lock();
+        mutex_jugadores.lock_shared();
         auto it = clients.begin();
         while(jugadores.size() > i && cm.getId() != jugadores[i].getId()){
           i++;
         }
-        if(i != jugadores.size()){
+        int n = jugadores.size();
+        mutex_jugadores.unlock_shared();
+        if(i != n){
+          mutex_jugadores.lock();
           jugadores[i].setPos(cm.getPos());
+          mutex_jugadores.unlock();
         }
-        mutex_jugadores.unlock();
         break;
       }
     }
@@ -130,12 +135,13 @@ void Server::update(){
 
 void Server::collision_detection()
 {
+  std::vector<int> eliminar;
   int x = 0, y = 0;
-  mutex_jugadores.lock();
+  mutex_jugadores.lock_shared();
   for(auto it = jugadores.begin(); it != jugadores.end(); ++it){
     Ball o1 = *it;
     y = 0;
-    for(auto itt = jugadores.begin() + x; itt != jugadores.end(); ++itt){
+    for(auto itt = jugadores.begin(); itt != jugadores.end(); ++itt){
       Ball o2 = *itt;
       if (o1.getId() != o2.getId())
       {
@@ -143,73 +149,96 @@ void Server::collision_detection()
         if((o1.getRadius() > o2.getRadius() + o1.getRadius()/4)&&
         (aux.magnitude() < o1.getRadius() + o2.getRadius()))
         {
-          mutex_clients.lock();
+          mutex_clients.lock_shared();
           o2.setType(Ball::DEAD);
           socket.send(o2, *clients[y]);
           o1.setType(Ball::EAT);
-          o1.addRadius(o2.getRadius());
+          o1.addRadius(o2.getRadius()/5);
           socket.send(o1, *clients[x]);
-          jugadores[x] = o1;
+          o2.setType(Ball::LOGOUT);
+          for(Socket* s1: clients){
+            socket.send(o2, *s1);
+          }
+          mutex_clients.unlock_shared();
+
+          mutex_clients.lock();
+          clients.erase(clients.begin() + y);
           mutex_clients.unlock();
+
+          mutex_jugadores.unlock_shared();
+          mutex_jugadores.lock();
+          jugadores.erase(jugadores.begin() + y);
+          jugadores[x] = o1;
+          mutex_jugadores.unlock();
+          mutex_jugadores.lock_shared();
+          itt = jugadores.begin() + (y - 1);
         }
       }
       y++;
     }
     y = 0;
-    mutex_comida.lock();
+    mutex_comida.lock_shared();
     for(Ball b: comida){
       Vector2D aux = o1.getPos() - b.getPos();
-      if((o1.getRadius() > b.getRadius() + o1.getRadius()/4)&&
-      (aux.magnitude() < o1.getRadius() + b.getRadius()))
+      if((aux.magnitude() < o1.getRadius() + b.getRadius()))
       {
-        mutex_clients.lock();
+        mutex_clients.lock_shared();
         o1.setType(Ball::EAT);
-        o1.addRadius(b.getRadius());
+        o1.addRadius(1);
         socket.send(o1, *clients[x]);
-        mutex_clients.unlock();
+        mutex_clients.unlock_shared();
 
-        jugadores[x] = o1;
+        mutex_jugadores.unlock_shared();
+        mutex_jugadores.lock();
+        jugadores[x].addRadius(1);
+        mutex_jugadores.unlock();
+        mutex_jugadores.lock_shared();
+
+        mutex_comida.unlock_shared();
+        mutex_comida.lock();
         comida[y] = getRandomBall();
-        Ball aux = comida[y];
+        mutex_comida.unlock();
+        mutex_comida.lock_shared();
 
-        mutex_clients.lock();
+        Ball aux = comida[y];
+        mutex_clients.lock_shared();
         aux.setType(Ball::POSITION);
         socket.send(aux, *clients[x]);
-        mutex_clients.unlock();
+        mutex_clients.unlock_shared();
       }
       y++;
     }
-    mutex_comida.unlock();
+    mutex_comida.unlock_shared();
     x++;
   }
-  mutex_jugadores.unlock();
+  mutex_jugadores.unlock_shared();
 }
 
 void Server::send_positions()
 {
   int i = 0;
-  mutex_jugadores.lock();
+  mutex_jugadores.lock_shared();
   for(auto it = jugadores.begin(); it != jugadores.end(); ++it){
     Ball o1 = *it;
     for(auto itt = jugadores.begin(); itt != jugadores.end(); ++itt){
       Ball o2 = *itt;
       if (o1.getId() != o2.getId())
       {
-        mutex_clients.lock();
+        mutex_clients.lock_shared();
         o2.setType(Ball::POSITION);
         socket.send(o2, *clients[i]);
-        mutex_clients.unlock();
+        mutex_clients.unlock_shared();
       }
     }
     i++;
   }
-  mutex_jugadores.unlock();
+  mutex_jugadores.unlock_shared();
 }
 
 
 Ball Server::getRandomBall(){
-  int x = rand() % WIN_WIDTH;
-  int y = rand() % WIN_HEIGHT;
+  int x = rand() % LEVEL_WIDTH;
+  int y = rand() % LEVEL_HEIGHT;
   return Ball(Vector2D(x, y), true);
 
 }

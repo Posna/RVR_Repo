@@ -5,6 +5,7 @@
 #include <vector>
 #include <mutex>
 #include <thread>
+#include <shared_mutex>
 #include "Vector2D.h"
 #include "Texture.h"
 #include "Socket.h"
@@ -29,6 +30,7 @@ private:
 	SDL_Window * window = nullptr; //Ventana de la aplicacion
 	SDL_Renderer* renderer = nullptr; //Render de la aplicacion
 	bool exit = false; //Bool para finalizar la ejecucion del juego
+	bool muerto = false; //Boll para saber cuando se muere el jugador
 	Texture* texturas[NUM_TEXTURES]; //Array de las texturas
 	//TexturesAtributes atributos[NUM_TEXTURES] = { "sdl_logo.bmp", 1, 1};
 	SDL_Rect cam = { 0, 0, WIN_WIDTH, WIN_HEIGHT };

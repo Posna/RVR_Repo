@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-g -I. -std=c++11 -I/usr/include/SDL2 -D_REENTRANT
+CFLAGS=-g -I. -std=c++17 -I/usr/include/SDL2 -D_REENTRANT
 DEPS = Vector2D.h Texture.h Ball.h Game.h Socket.h Server.h 
 OBJ  = Vector2D.o Texture.o Ball.o Game.o Socket.o Server.o 
 LIBS=-lpthread -lm -lX11 -std=c++11 -lSDL2 -lSDL2_image -lSDL2_gfx

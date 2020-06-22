@@ -75,7 +75,8 @@ void Game::run() {
 			}
 			render();
 	}
-	logout();
+	if(!muerto)
+		logout();
 }
 
 void Game::update(uint32_t frameTime) {
@@ -133,6 +134,7 @@ void Game::recieve_information()
 				{
 					printf("Me he muerto\n");
 					exit = true;
+					muerto = true;
 				}
 				break;
 
