@@ -32,6 +32,7 @@ public:
     void send_positions();
 
     Ball getRandomBall();
+    Ball getRandomBall(int id);
 
 private:
     uint32_t id_actual;

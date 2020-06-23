@@ -39,9 +39,8 @@ void Server::recieve_messages()
 
           mutex_comida.lock_shared();
           for(Ball b: comida){
-            Ball aux = b;
-            aux.setType(Ball::LOGIN);
-            socket.send(aux, *s);
+            b.setType(Ball::LOGIN);
+            socket.send(b, *s);
           }
           mutex_comida.unlock_shared();
 
@@ -147,7 +146,7 @@ void Server::collision_detection()
       {
         Vector2D aux = o1.getPos() - o2.getPos();
         if((o1.getRadius() > o2.getRadius() + o1.getRadius()/4)&&
-        (aux.magnitude() < o1.getRadius() + o2.getRadius()))
+        (aux.magnitude() < o1.getRadius()))
         {
           mutex_clients.lock_shared();
           o2.setType(Ball::DEAD);
@@ -183,27 +182,30 @@ void Server::collision_detection()
       if((aux.magnitude() < o1.getRadius() + b.getRadius()))
       {
         mutex_clients.lock_shared();
+        float incremento = (50.0f*b.getRadius())/(49.0f * o1.getRadius()+ b.getRadius());
         o1.setType(Ball::EAT);
-        o1.addRadius(1);
+        o1.addRadius(incremento);
         socket.send(o1, *clients[x]);
         mutex_clients.unlock_shared();
 
         mutex_jugadores.unlock_shared();
         mutex_jugadores.lock();
-        jugadores[x].addRadius(1);
+        jugadores[x].addRadius(incremento);
         mutex_jugadores.unlock();
         mutex_jugadores.lock_shared();
 
         mutex_comida.unlock_shared();
         mutex_comida.lock();
-        comida[y] = getRandomBall();
+        comida[y] = getRandomBall(comida[y].getId());
         mutex_comida.unlock();
         mutex_comida.lock_shared();
 
         Ball aux = comida[y];
         mutex_clients.lock_shared();
         aux.setType(Ball::POSITION);
-        socket.send(aux, *clients[x]);
+        for(Socket* s: clients){
+          socket.send(aux, *s);
+        }
         mutex_clients.unlock_shared();
       }
       y++;
@@ -241,4 +243,10 @@ Ball Server::getRandomBall(){
   int y = rand() % LEVEL_HEIGHT;
   return Ball(Vector2D(x, y), true);
 
+}
+
+Ball Server::getRandomBall(int id){
+  Ball b = getRandomBall();
+  b.setId(id);
+  return b;
 }

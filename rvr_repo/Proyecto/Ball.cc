@@ -1,13 +1,13 @@
 #include "Ball.h"
-
-Ball::Ball(Vector2D pos, Texture* t, uint16_t radio): pos_(pos),
+#include <math.h>
+Ball::Ball(Vector2D pos, Texture* t, float radio): pos_(pos),
   radio_(radio), texture_(t)
 {
 
 
 }
 
-Ball::Ball(Vector2D pos, bool r, uint16_t radio, uint32_t color): pos_(pos),
+Ball::Ball(Vector2D pos, bool r, float radio, uint32_t color): pos_(pos),
   radio_(radio), color_(color)
 {
   if(r){
@@ -40,7 +40,7 @@ void Ball::update(uint32_t frameTime){
   vel_ = Vector2D(x - WIN_WIDTH/2, y - WIN_HEIGHT/2);
   vel_.normaliza();
 
-  pos_ = pos_ + vel_ * 0.5;
+  pos_ = pos_ + vel_ * (radio_/(pow(radio_, 1.01f)));
 
   //comprobacion de que esta dentro del recuadro del juego
   x = pos_.getX();
@@ -84,8 +84,8 @@ void Ball::to_bin(){
   tmp += sizeof(uint16_t);
   memcpy(tmp, &y, sizeof(uint16_t));
   tmp += sizeof(uint16_t);
-  memcpy(tmp, &radio_, sizeof(uint16_t));
-  tmp += sizeof(uint16_t);
+  memcpy(tmp, &radio_, sizeof(float));
+  tmp += sizeof(float);
   memcpy(tmp, &id_, sizeof(uint32_t));
   tmp += sizeof(uint32_t);
   //printf("Vector2D(%d, %d) r: %d id: %d\n", pos_.getX(), pos_.getY(), radio_, id_);
@@ -104,15 +104,16 @@ int Ball::from_bin(char * data){
   memcpy(&type, tmp, sizeof(uint8_t));
   tmp += sizeof(uint8_t);
 
-  uint16_t x, y, r;
+  uint16_t x, y;
+  float r;
   memcpy(&x, tmp, sizeof(uint16_t));
   tmp += sizeof(uint16_t);
 
   memcpy(&y, tmp, sizeof(uint16_t));
   tmp += sizeof(uint16_t);
 
-  memcpy(&r, tmp, sizeof(uint16_t));
-  tmp += sizeof(uint16_t);
+  memcpy(&r, tmp, sizeof(float));
+  tmp += sizeof(float);
 
   memcpy(&id_, tmp, sizeof(uint32_t));
 
@@ -125,15 +126,15 @@ int Ball::from_bin(char * data){
 
 }
 
-const uint16_t Ball::getRadius(){
+const float Ball::getRadius(){
   return radio_;
 }
 
-void Ball::setRadius(uint16_t r){
+void Ball::setRadius(float r){
   radio_ = r;
 }
 
-void Ball::addRadius(uint16_t r){
+void Ball::addRadius(float r){
    radio_+=r;
 }
 

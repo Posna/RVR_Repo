@@ -21,11 +21,10 @@ Game::Game(const char* s, const char* p): socket(s,p) {
 	//for (int i = 0; i < NUM_TEXTURES; i++) {
 	//	texturas[i] = new Texture(renderer, atributos[i].nombre, atributos[i].row, atributos[i].col);
 	//}
-
 	//Bolitas de prueba
 	//bolitas = {new Ball(Vector2D(500, 300)), new Ball(Vector2D(1300, 10)), new Ball(Vector2D(1700, 10))};
 
-	player = new Ball(Vector2D(500, 300), true, 10);
+	player = new Ball(Vector2D(500, 300), true, 10.0f);
 
   /* INICIALIZACION DE TODO DEL JUEGO */
 }

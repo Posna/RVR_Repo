@@ -22,6 +22,8 @@ const uint32_t FRAME_RATE = 16;
 const int LEVEL_WIDTH = 700;
 const int LEVEL_HEIGHT = 700;
 
+const int MAX_BOLITAS = 100;
+
 
 class Ball;
 
@@ -43,6 +45,7 @@ private:
 	void sendPos();
 	void login();
 	void logout();
+
 
 public:
 	Game(const char* s, const char* p);
