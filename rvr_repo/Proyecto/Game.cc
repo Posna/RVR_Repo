@@ -132,8 +132,8 @@ void Game::recieve_information()
 				case Ball::DEAD:
 				{
 					printf("Me he muerto\n");
-					exit = true;
 					muerto = true;
+					exit = true;
 				}
 				break;
 

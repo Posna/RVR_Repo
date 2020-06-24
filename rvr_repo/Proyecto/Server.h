@@ -43,6 +43,8 @@ private:
     std::vector<Socket *> clients;
     std::vector<Ball> jugadores;
     std::vector<Ball> comida;
+
+    std::vector<int> eliminador;
     /**
      * Socket del servidor
      */

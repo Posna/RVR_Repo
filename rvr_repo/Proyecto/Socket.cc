@@ -43,10 +43,10 @@ int Socket::recv(Serializable &obj, Socket * &sock)
         return -1;
     }
 
-    if ( sock != 0 ) //a 0 es que es NULL??
-    {
-        sock = new Socket(&sa, sa_len);
-    }
+    //if ( sock != 0 ) //a 0 es que es NULL??
+    //{
+    sock = new Socket(&sa, sa_len);
+    //}
 
     obj.from_bin(buffer);
 

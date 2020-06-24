@@ -51,6 +51,9 @@ public:
 
   const uint32_t getId();
   void setId(uint32_t id);
+
+  void kill();
+  bool IsDead();
 private:
   Game* g_;
   Texture* texture_;
@@ -59,6 +62,7 @@ private:
   uint32_t color_;
   Vector2D vel_;
   uint16_t speed_ = 1;
+  bool muerto = false;
 
   //Variables a serializar
   uint8_t type;

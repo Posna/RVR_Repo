@@ -13,8 +13,8 @@ public:
 	Vector2D() {}
 	Vector2D(double x, double y) :
 		x(x), y(y) {}
-	uint16_t getX() const;
-	uint16_t getY() const;
+	int16_t getX() const;
+	int16_t getY() const;
 	void normaliza();
 	float magnitude();
 	Vector2D operator+(const Vector2D& v) const;

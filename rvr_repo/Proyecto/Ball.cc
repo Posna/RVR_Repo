@@ -186,3 +186,11 @@ const uint32_t Ball::getId(){
 void Ball::setId(uint32_t id){
   id_ = id;
 }
+
+void Ball::kill(){
+  muerto = true;
+}
+
+bool Ball::IsDead(){
+  return muerto;
+}
