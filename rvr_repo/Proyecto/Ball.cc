@@ -40,7 +40,7 @@ void Ball::update(uint32_t frameTime){
   vel_ = Vector2D(x - WIN_WIDTH/2, y - WIN_HEIGHT/2);
   vel_.normaliza();
 
-  pos_ = pos_ + vel_ * (radio_/(pow(radio_, 1.01f)));
+  pos_ = pos_ + vel_ * (radio_/(pow(radio_, 1.1f)));
 
   //comprobacion de que esta dentro del recuadro del juego
   x = pos_.getX();
