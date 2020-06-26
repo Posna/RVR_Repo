@@ -29,11 +29,8 @@ int main(int argc, char **argv)
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
     pthread_create(&id, &attr, _server_thread, static_cast<void *>(&es));
-    //sleep(20);
-    //std::thread ms(&Server::update, &es);
-    //es.update();
+
     es.recieve_messages();
-    //ms.join();
 
 
     return 0;

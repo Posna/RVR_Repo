@@ -72,7 +72,6 @@ void Server::recieve_messages()
         }
         break;
 
-        //Hay que mandar mensaje a todos los jugadores de que un id se ha desconectado para que no lo pinten
         case Ball::LOGOUT:{
           int i = 0;
           mutex_clients.lock_shared();
@@ -130,12 +129,12 @@ void Server::recieve_messages()
 void Server::update(){
   while(true){
     collision_detection();
+    //sleep(0.1); //Prueba de lag
     send_positions();
-
   }
-
 }
 
+//Comprueba colisiones primero entre jugadores y luego entre jugadores y comida
 void Server::collision_detection()
 {
   int x = 0, y = 0;
@@ -166,18 +165,11 @@ void Server::collision_detection()
 
           eliminador.push_back(y);
 
-          /*mutex_clients.lock();
-          clients.erase(clients.begin() + y);
-          mutex_clients.unlock();*/
-
           mutex_jugadores.unlock_shared();
           mutex_jugadores.lock();
           jugadores[x].setRadius(o1.getRadius());
-          //jugadores.erase(jugadores.begin() + y);
           mutex_jugadores.unlock();
           mutex_jugadores.lock_shared();
-          /*y--;
-          itt = jugadores.begin() + y;*/
         }
       }
       y++;
@@ -219,6 +211,7 @@ void Server::collision_detection()
     mutex_comida.unlock_shared();
     x++;
   }
+  //Elimina todas la bolas que hayan muerto en esta iteracion
   mutex_jugadores.unlock_shared();
   for(int i = 0; i < eliminador.size(); i++){
     mutex_jugadores.lock();
@@ -231,6 +224,7 @@ void Server::collision_detection()
   eliminador.clear();
 }
 
+//Envia la posicion de cada jugador a los demas jugadores
 void Server::send_positions()
 {
   int i = 0;
@@ -251,7 +245,6 @@ void Server::send_positions()
   }
   mutex_jugadores.unlock_shared();
 }
-
 
 Ball Server::getRandomBall(){
   int x = rand() % LEVEL_WIDTH;

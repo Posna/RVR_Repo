@@ -27,11 +27,9 @@ Ball::~Ball(){
 
 }
 
+//Renderiza una esfera en una posicion concreta
 void Ball::render(SDL_Renderer* renderer) const{
   filledCircleColor(renderer, pos_.getX() - desfase_.getX(), pos_.getY() - desfase_.getY(), radio_, color_);
-
-
-
 }
 
 void Ball::update(uint32_t frameTime){
@@ -40,7 +38,7 @@ void Ball::update(uint32_t frameTime){
   vel_ = Vector2D(x - WIN_WIDTH/2, y - WIN_HEIGHT/2);
   vel_.normaliza();
 
-  pos_ = pos_ + vel_ * (radio_/(pow(radio_, 1.1f)));
+  pos_ = pos_ + vel_ * ((-radio_/18)+(50/9));//((5.0f/((radio_/2)*0.2f))+5.0f);
 
   //comprobacion de que esta dentro del recuadro del juego
   x = pos_.getX();
@@ -88,8 +86,6 @@ void Ball::to_bin(){
   tmp += sizeof(float);
   memcpy(tmp, &id_, sizeof(uint32_t));
   tmp += sizeof(uint32_t);
-  //printf("Vector2D(%d, %d) r: %d id: %d\n", pos_.getX(), pos_.getY(), radio_, id_);
-  //printf("%d\n", *tmp);
 }
 
 int Ball::from_bin(char * data){
@@ -120,7 +116,6 @@ int Ball::from_bin(char * data){
   radio_ = r;
   pos_ = Vector2D(x, y);
 
-  //printf("Vector2D(%d, %d) r: %d id: %d\n", pos_.getX(), pos_.getY(), radio_, id_);
 
   return 0;
 
@@ -138,6 +133,8 @@ void Ball::addRadius(float r){
    radio_+=r;
 }
 
+//Este metodo se usa para que el jugador sea el punto medio
+//y todo vaya en funcion del mismo
 void Ball::desfase(Vector2D d){
   desfase_ = d;
 }

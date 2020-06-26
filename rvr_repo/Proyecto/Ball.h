@@ -33,8 +33,7 @@ public:
   const float getRadius();
   void setRadius(float r);
   void addRadius(float r);
-  //Este metodo se usa para que el jugador sea el punto medio
-  //y todo vaya en funcion del mismo
+  
   void desfase(Vector2D d);
 
   const Vector2D getPos();

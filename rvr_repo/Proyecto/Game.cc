@@ -1,5 +1,6 @@
 #include <string.h>
 #include "Ball.h"
+#include <time.h>
 
 
 using namespace std;
@@ -12,21 +13,16 @@ Game::Game(const char* s, const char* p): socket(s,p) {
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 	window = SDL_CreateWindow("Edgar.io", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_SHOWN);
-	//SDL_RenderSetLogicalSize(WIN_WIDTH, WIN_HEIGHT);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (window == nullptr || renderer == nullptr)
-    printf("Error loading the SDL window or renderer"); //Esto deberia dar un error
-
-	//Inicializacion de las texturas
-	//for (int i = 0; i < NUM_TEXTURES; i++) {
-	//	texturas[i] = new Texture(renderer, atributos[i].nombre, atributos[i].row, atributos[i].col);
-	//}
-	//Bolitas de prueba
-	//bolitas = {new Ball(Vector2D(500, 300)), new Ball(Vector2D(1300, 10)), new Ball(Vector2D(1700, 10))};
-
-	player = new Ball(Vector2D(500, 300), true, 10.0f);
+    printf("Error loading the SDL window or renderer");
 
   /* INICIALIZACION DE TODO DEL JUEGO */
+	srand (time(NULL)); //seed del random
+
+	int x = rand() % LEVEL_WIDTH;
+  int y = rand() % LEVEL_HEIGHT;
+	player = new Ball(Vector2D(x, y), true, 10.0f);
 }
 
 void Game::render() const{
@@ -53,17 +49,13 @@ void Game::handleEvents() {
 	while (SDL_PollEvent(&event) && !exit) {
 		if (event.type == SDL_QUIT)
       exit = true;
-		//if(event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_UP)
-		//	player->addRadius(1);
-
 	}
 }
 
 void Game::run() {
 	uint32_t startTime, frameTime;
 	startTime = SDL_GetTicks();
-	login();
-	//login a server
+	login(); //Login al server
 	while (!exit) {
 			handleEvents();
 			frameTime = SDL_GetTicks() - startTime; // Tiempo desde última actualización
@@ -172,6 +164,7 @@ void Game::recieve_information()
 }
 Game::~Game() {
 	delete player;
+	bolitas.clear();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();

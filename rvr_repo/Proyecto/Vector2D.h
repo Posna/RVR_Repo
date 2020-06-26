@@ -22,6 +22,4 @@ public:
 	Vector2D operator*(double d) const;
 	double operator*(const Vector2D& v) const;
 
-
-
 };
